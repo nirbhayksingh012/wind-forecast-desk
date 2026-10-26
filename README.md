@@ -106,11 +106,9 @@ In Great Britain, physical electricity delivery is traded in wholesale day-ahead
 │   │   └── main.jsx
 │   ├── index.html                # HTML entrypoint with metadata and typography
 │   └── package.json
-├── api/
-│   └── index.py                  # Vercel serverless function entrypoint
 ├── Dockerfile                    # Multi-stage Docker build (Node.js build -> Python slim runtime)
 ├── docker-compose.yml            # Single-command local containerised execution
-├── vercel.json                   # Vercel serverless routing configuration
+├── vercel.json                   # Vercel multi-service routing configuration (Vite + FastAPI)
 ├── heroku.yml                    # Heroku container deployment manifest
 ├── requirements.txt              # Production Python dependencies
 ├── pyproject.toml                # Root pytest configuration
@@ -193,9 +191,9 @@ All 39 tests validate:
 
 ## Deployment Options
 
-1. **Vercel (Serverless):**
+1. **Vercel (Multi-Service Native):**
    - Connect the repository to Vercel.
-   - `vercel.json` automatically builds the React frontend to `frontend/dist` and mounts `api/index.py` as a serverless Python function handling `/api/*`.
+   - `vercel.json` deploys the frontend (`frontend/`, Vite) and backend (`backend/`, FastAPI) as native coordinated services with `/api/*` routed directly to FastAPI.
 2. **Heroku / Container Platform:**
    - Deploy using the multi-stage `Dockerfile` and `heroku.yml`.
    - The container builds the frontend assets and runs `uvicorn` to serve both the JSON API and static files with health monitoring.
