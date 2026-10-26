@@ -26,6 +26,9 @@ if not _candidate_data.exists():
         Path("backend/data/snapshot.json.gz"),
         Path("data/snapshot.json.gz"),
         Path("/var/task/backend/data/snapshot.json.gz"),
+        Path("/var/task/data/snapshot.json.gz"),
+        Path.cwd() / "backend" / "data" / "snapshot.json.gz",
+        Path.cwd() / "data" / "snapshot.json.gz",
     ]:
         if _fb.exists():
             _candidate_data = _fb

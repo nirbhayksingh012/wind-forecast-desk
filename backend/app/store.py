@@ -52,9 +52,16 @@ def get_data() -> tuple[Dataset, dict]:
     """Returns (dataset, meta). Loads the snapshot, fetching live data if missing."""
     with _lock:
         if "ds" not in _cache:
-            if not DATA_PATH.exists():
-                fetch_live_and_save(DATA_PATH)
-            with gzip.open(DATA_PATH, "rt", encoding="utf-8") as f:
+            target_path = DATA_PATH
+            if not target_path.exists():
+                try:
+                    fetch_live_and_save(target_path)
+                except OSError:
+                    # Serverless root filesystems are read-only; fallback to writable /tmp
+                    target_path = Path("/tmp/snapshot.json.gz")
+                    if not target_path.exists():
+                        fetch_live_and_save(target_path)
+            with gzip.open(target_path, "rt", encoding="utf-8") as f:
                 raw = json.load(f)
             _cache["ds"] = build_dataset(raw["actuals"], raw["forecasts"])
             _cache["meta"] = {

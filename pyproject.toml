@@ -1,3 +1,29 @@
+[project]
+name = "wind-forecast-desk"
+version = "0.1.0"
+description = "Day-ahead wind forecast analyser"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.6",
+    "uvicorn>=0.34.0",
+    "httpx>=0.28.1",
+    "tzdata>=2025.2",
+    "pytest>=8.3.4",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["backend*"]
+
+[tool.uv]
+package = false
+
 [tool.pytest.ini_options]
 testpaths = ["backend/tests"]
 pythonpath = ["backend"]
+
+
