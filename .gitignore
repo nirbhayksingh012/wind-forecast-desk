@@ -8,3 +8,5 @@ __pycache__/
 .env
 # NOTE: backend/data/snapshot.json.gz is deliberately NOT ignored - commit it after
 # running `python -m app.fetch_data` so Vercel/Heroku can serve real data without a live fetch.
+*.zip
+

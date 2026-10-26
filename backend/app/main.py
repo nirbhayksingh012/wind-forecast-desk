@@ -6,7 +6,7 @@ import os
 import re
 from datetime import date
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import APIRouter, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -52,12 +52,15 @@ def _data():
         raise HTTPException(503, f"Data not available: {exc}")
 
 
-@app.get("/api/health")
+router = APIRouter()
+
+
+@router.get("/health")
 def health():
     return {"status": "ok"}
 
 
-@app.get("/api/meta")
+@router.get("/meta")
 def meta():
     ds, info = _data()
     days = analysis.delivery_dates(DECISION_START, DECISION_END)
@@ -71,7 +74,7 @@ def meta():
     }
 
 
-@app.get("/api/forecast")
+@router.get("/forecast")
 def forecast(delivery_date: date, cutoff: str = Query(DEFAULT_CUTOFF)):
     """The forecast a buyer sees at the cutoff for each half-hour of the delivery day."""
     cutoff = _cutoff(cutoff)
@@ -108,17 +111,21 @@ def forecast(delivery_date: date, cutoff: str = Query(DEFAULT_CUTOFF)):
     }
 
 
-@app.get("/api/accuracy")
+@router.get("/accuracy")
 def accuracy(cutoff: str = Query(DEFAULT_CUTOFF)):
     ds, _ = _data()
     return analysis.accuracy_report(ds, DECISION_START, DECISION_END, _cutoff(cutoff))
 
 
-@app.get("/api/cutoff-sensitivity")
+@router.get("/cutoff-sensitivity")
 def cutoff_sensitivity():
     ds, _ = _data()
     return analysis.cutoff_sensitivity(ds, DECISION_START, DECISION_END, CUTOFF_OPTIONS)
 
+
+# Mount router under both /api and root so both /api/health and /health work
+app.include_router(router, prefix="/api")
+app.include_router(router)
 
 # --- static frontend (Docker / Heroku). On Vercel the CDN serves it instead. ---
 if STATIC_DIR.exists():
@@ -128,3 +135,4 @@ if STATIC_DIR.exists():
     def spa(path: str):
         f = STATIC_DIR / path
         return FileResponse(f if path and f.is_file() else STATIC_DIR / "index.html")
+
