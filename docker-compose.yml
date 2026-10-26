@@ -1,0 +1,8 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      # Lets the container use / persist the snapshot produced by `python -m app.fetch_data`
+      - ./backend/data:/app/backend/data
